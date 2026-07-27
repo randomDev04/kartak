@@ -1,20 +1,13 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
+from app.routes import items
 
 app = FastAPI(title="Kartak API")
 
-class Item(BaseModel):
-    name:str
-    price:float
-    in_stock:bool = True
+app.include_router(items.router)
 
-@app.post("/items")
-def post_item(item:Item):
-    return {"item":item, "message":"Item created successfully."}
-
-@app.get("/items/{item_id}")
-def get_item(item_id:int):
-    return {"item_id": item_id, "message": "Item retrieved successfully."}  
+@app.get("/")
+def hello_world():
+    return {"message": "Hello, World!"}
 
 @app.get("/search")
 def search_items(query:str | None = None):
