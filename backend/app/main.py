@@ -2,7 +2,6 @@ from fastapi import FastAPI
 
 from app.database import engine, Base
 from app.routes import items
-from app.models import Item
 
 Base.metadata.create_all(bind=engine)
 
