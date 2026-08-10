@@ -8,6 +8,7 @@ export default function Products() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [buyingProductId, setBuyingProductId] = useState(null);
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
@@ -19,15 +20,20 @@ export default function Products() {
   }, []);
 
   async function buyOne(productId) {
+    if (buyingProductId) return;
     setMessage("");
     setError("");
+    setBuyingProductId(productId);
     try {
       await api.createOrder([{ product_id: productId, quantity: 1 }]);
       setMessage("Order placed!");
+      setTimeout(() => setMessage(""), 3000);
       const updated = await api.listProducts();
       setProducts(updated);
     } catch (err) {
       setError(err.message);
+    } finally {
+      setBuyingProductId(null);
     }
   }
 
@@ -50,6 +56,7 @@ export default function Products() {
               product={p}
               isAuthenticated={isAuthenticated}
               onBuy={buyOne}
+              isBuying={buyingProductId === p.id}
             />
           ))}
         </ul>
