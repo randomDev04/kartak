@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Products from "./pages/Products";
 import Orders from "./pages/Orders";
+import ProtectedRoute from "./components/ProtectedRoute";
 import "./App.css";
 
 function Nav() {
@@ -33,11 +34,6 @@ function Nav() {
   );
 }
 
-function PrivateRoute({ children }) {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
-}
-
 function AppRoutes() {
   return (
     <>
@@ -51,9 +47,9 @@ function AppRoutes() {
           <Route
             path="/orders"
             element={
-              <PrivateRoute>
+              <ProtectedRoute>
                 <Orders />
-              </PrivateRoute>
+              </ProtectedRoute>
             }
           />
         </Routes>

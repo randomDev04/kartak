@@ -39,7 +39,7 @@ export default function Products() {
       {message && <p className="success">{message}</p>}
       
       {!isLoading && !error && products.length === 0 && (
-        <p>No products found.</p>
+        <p className="empty-state">No products found.</p>
       )}
 
       {!isLoading && products.length > 0 && (
