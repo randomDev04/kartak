@@ -4,12 +4,17 @@ import { useAuth } from "../AuthContext";
 
 export default function Products() {
   const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    api.listProducts().then(setProducts).catch((err) => setError(err.message));
+    setIsLoading(true);
+    api.listProducts()
+      .then(setProducts)
+      .catch((err) => setError(err.message))
+      .finally(() => setIsLoading(false));
   }, []);
 
   async function buyOne(productId) {
@@ -28,9 +33,11 @@ export default function Products() {
   return (
     <div>
       <h2>Products</h2>
+      {isLoading && <p>Loading products...</p>}
       {error && <p className="error">{error}</p>}
       {message && <p className="success">{message}</p>}
-      <ul className="product-list">
+      {!isLoading && (
+        <ul className="product-list">
         {products.map((p) => (
           <li key={p.id}>
             <strong>{p.name}</strong> — ${p.price.toFixed(2)} ({p.stock} in stock)
@@ -42,7 +49,8 @@ export default function Products() {
             )}
           </li>
         ))}
-      </ul>
+        </ul>
+      )}
     </div>
   );
 }
