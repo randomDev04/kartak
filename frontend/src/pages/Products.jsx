@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../api";
 import { useAuth } from "../AuthContext";
 import ProductCard from "../components/ProductCard";
+import { useNavigate } from "react-router-dom";
 
 export default function Products() {
   const [products, setProducts] = useState([]);
@@ -10,6 +11,7 @@ export default function Products() {
   const [message, setMessage] = useState("");
   const [buyingProductId, setBuyingProductId] = useState(null);
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setIsLoading(true);
@@ -26,8 +28,7 @@ export default function Products() {
     setBuyingProductId(productId);
     try {
       await api.createOrder([{ product_id: productId, quantity: 1 }]);
-      setMessage("Order placed!");
-      setTimeout(() => setMessage(""), 3000);
+      setMessage("Order placed successfully!");
       const updated = await api.listProducts();
       setProducts(updated);
     } catch (err) {
@@ -42,7 +43,12 @@ export default function Products() {
       <h2>Products</h2>
       {isLoading && <p>Loading products...</p>}
       {error && <p className="error">{error}</p>}
-      {message && <p className="success">{message}</p>}
+      {message && (
+        <div className="success" style={{ display: "flex", gap: "1rem", alignItems: "center", marginBottom: "1rem" }}>
+          <p>{message}</p>
+          <button onClick={() => navigate("/orders")}>View Orders</button>
+        </div>
+      )}
       
       {!isLoading && !error && products.length === 0 && (
         <p className="empty-state">No products found.</p>
