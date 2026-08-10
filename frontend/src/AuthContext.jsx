@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { api } from "./api";
 
 const AuthContext = createContext(null);
@@ -16,6 +16,15 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("token");
     setToken(null);
   }
+
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      console.log("Unauthorized event detected, logging out...");
+      logout();
+    };
+    window.addEventListener("unauthorized", handleUnauthorized);
+    return () => window.removeEventListener("unauthorized", handleUnauthorized);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ token, isAuthenticated: Boolean(token), login, logout }}>

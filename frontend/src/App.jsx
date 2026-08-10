@@ -1,9 +1,10 @@
-import { Navigate, Route, Routes, Link, useNavigate } from "react-router-dom";
+import { Navigate, Route, Routes, NavLink, useNavigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./AuthContext";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Products from "./pages/Products";
 import Orders from "./pages/Orders";
+import ProtectedRoute from "./components/ProtectedRoute";
 import "./App.css";
 
 function Nav() {
@@ -15,25 +16,22 @@ function Nav() {
     navigate("/login");
   }
 
+  const getNavStyle = ({ isActive }) => (isActive ? { fontWeight: "bold", textDecoration: "underline" } : {});
+
   return (
     <nav>
-      <Link to="/products">Products</Link>
-      {isAuthenticated && <Link to="/orders">My Orders</Link>}
+      <NavLink to="/products" style={getNavStyle}>Products</NavLink>
+      {isAuthenticated && <NavLink to="/orders" style={getNavStyle}>My Orders</NavLink>}
       {isAuthenticated ? (
         <button onClick={handleLogout}>Log out</button>
       ) : (
         <>
-          <Link to="/login">Log in</Link>
-          <Link to="/register">Register</Link>
+          <NavLink to="/login" style={getNavStyle}>Log in</NavLink>
+          <NavLink to="/register" style={getNavStyle}>Register</NavLink>
         </>
       )}
     </nav>
   );
-}
-
-function PrivateRoute({ children }) {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
 }
 
 function AppRoutes() {
@@ -49,9 +47,9 @@ function AppRoutes() {
           <Route
             path="/orders"
             element={
-              <PrivateRoute>
+              <ProtectedRoute>
                 <Orders />
-              </PrivateRoute>
+              </ProtectedRoute>
             }
           />
         </Routes>
