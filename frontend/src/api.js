@@ -9,18 +9,30 @@ async function request(path, { method = "GET", body, auth = false, form = false 
   if (body && !form) headers["Content-Type"] = "application/json";
   if (auth) headers["Authorization"] = `Bearer ${getToken()}`;
 
-  const res = await fetch(`${BASE_URL}${path}`, {
-    method,
-    headers,
-    body: form ? body : body ? JSON.stringify(body) : undefined,
-  });
+  try {
+    const res = await fetch(`${BASE_URL}${path}`, {
+      method,
+      headers,
+      body: form ? body : body ? JSON.stringify(body) : undefined,
+    });
 
-  if (!res.ok) {
-    const detail = await res.json().catch(() => ({}));
-    throw new Error(detail.detail || `Request failed with ${res.status}`);
+    if (res.status === 401) {
+      window.dispatchEvent(new Event("unauthorized"));
+      throw new Error("Unauthorized");
+    }
+
+    if (!res.ok) {
+      const detail = await res.json().catch(() => ({}));
+      throw new Error(detail.detail || `Request failed with ${res.status}`);
+    }
+    if (res.status === 204) return null;
+    return await res.json();
+  } catch (err) {
+    if (err.name === "TypeError") {
+      throw new Error("Unable to connect to the server. Please check your connection.");
+    }
+    throw err;
   }
-  if (res.status === 204) return null;
-  return res.json();
 }
 
 export const api = {
