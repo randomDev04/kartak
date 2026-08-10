@@ -37,7 +37,12 @@ export default function Products() {
       {isLoading && <p>Loading products...</p>}
       {error && <p className="error">{error}</p>}
       {message && <p className="success">{message}</p>}
-      {!isLoading && (
+      
+      {!isLoading && !error && products.length === 0 && (
+        <p>No products found.</p>
+      )}
+
+      {!isLoading && products.length > 0 && (
         <ul className="product-list">
           {products.map((p) => (
             <ProductCard
