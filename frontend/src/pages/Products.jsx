@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
 import { useAuth } from "../AuthContext";
+import ProductCard from "../components/ProductCard";
 
 export default function Products() {
   const [products, setProducts] = useState([]);
@@ -38,17 +39,14 @@ export default function Products() {
       {message && <p className="success">{message}</p>}
       {!isLoading && (
         <ul className="product-list">
-        {products.map((p) => (
-          <li key={p.id}>
-            <strong>{p.name}</strong> — ${p.price.toFixed(2)} ({p.stock} in stock)
-            <p>{p.description}</p>
-            {isAuthenticated && (
-              <button disabled={p.stock < 1} onClick={() => buyOne(p.id)}>
-                Buy 1
-              </button>
-            )}
-          </li>
-        ))}
+          {products.map((p) => (
+            <ProductCard
+              key={p.id}
+              product={p}
+              isAuthenticated={isAuthenticated}
+              onBuy={buyOne}
+            />
+          ))}
         </ul>
       )}
     </div>
