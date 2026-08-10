@@ -12,6 +12,16 @@ export default function Login() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
+
+    if (!email.includes("@") || !email.includes(".")) {
+      setError("Please enter a valid email");
+      return;
+    }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
+
     try {
       await login(email, password);
       navigate("/products");
@@ -24,12 +34,24 @@ export default function Login() {
     <form onSubmit={handleSubmit}>
       <h2>Log in</h2>
       {error && <p className="error">{error}</p>}
-      <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+      <input 
+        type="email" 
+        placeholder="Email" 
+        value={email} 
+        onChange={(e) => {
+          setEmail(e.target.value);
+          if (error) setError("");
+        }} 
+        required 
+      />
       <input
         type="password"
         placeholder="Password"
         value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        onChange={(e) => {
+          setPassword(e.target.value);
+          if (error) setError("");
+        }}
         required
       />
       <button type="submit">Log in</button>
