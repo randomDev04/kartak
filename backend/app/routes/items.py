@@ -25,5 +25,16 @@ def get_item(item_id:int, db:Session=Depends(get_db)):
     item = db.get(ItemModel, item_id)
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
-    return {"item": item, "message": "Item retrieved successfully."}  
+    return {"item": item, "message": "Item retrieved successfully."}
+
+@router.get("/")
+def get_Items(db:Session=Depends(get_db)):
+    todos = db.query(ItemModel).all()
+
+    return {
+        "total":len(todos),
+        "items":todos,
+        "message":"Items retrieved successfully."
+    }
+
 
