@@ -8,3 +8,10 @@ class Item(Base):
     name:Mapped[str] = mapped_column(String(100))
     price:Mapped[float] = mapped_column()
     in_stock:Mapped[bool] = mapped_column(default=True)
+
+class User(Base):
+    __tablename__ = "users"
+    id:Mapped[int] = mapped_column(Integer, primary_key=True)
+    username:Mapped[str] = mapped_column(String(100), unique=True)
+    email:Mapped[str] = mapped_column(String(100), unique=True)
+    password:Mapped[str] = mapped_column(String(100))
