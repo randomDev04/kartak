@@ -43,3 +43,15 @@ def update_blog(blog_id:int, blog:schemas.BlogCreate, db:Session=Depends(get_db)
     db.commit()
     db.refresh(existing_blog)
     return existing_blog
+
+# Delete a blog by ID endpoint
+@router.delete("/{blog_id}")
+def delete_blog(blog_id:int, db:Session=Depends(get_db)):
+    blog = db.query(BlogModel).filter(BlogModel.id == blog_id).first()
+    if not blog:
+        raise HTTPException(status_code=404, detail="Blog not found")
+    db.delete(blog)
+    db.commit()
+    return {
+        "message": "Blog deleted successfully",
+    }
