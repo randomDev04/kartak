@@ -11,5 +11,11 @@ class BlogResponse(BaseModel):
     title: str
     content: str
 
+class BlogListResponse(BaseModel):
+    total: int
+    page: int
+    limit: int
+    data: list[BlogResponse]
+
     class Config:
         from_attributes = True

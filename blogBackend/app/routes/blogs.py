@@ -1,5 +1,7 @@
 
-from fastapi import APIRouter, Depends, HTTPException
+from operator import ge
+
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from app.schemas import schemas
 from app.database import get_db
@@ -19,9 +21,22 @@ def create_blog(blog:schemas.BlogCreate, db:Session=Depends(get_db), user:dict =
     return new_blog
 
 # Get all blogs endpoint
-@router.get("/", response_model=list[schemas.BlogResponse])
-def get_blogs(db:Session=Depends(get_db)):
-    return db.query(BlogModel).all()
+@router.get("/", response_model=schemas.BlogListResponse)
+def get_blogs(page: int = Query(1, ge=1), limit: int = Query(default=5, ge=1, le=100), search: str = Query(default=""), db:Session=Depends(get_db)):
+
+    query = db.query(BlogModel)
+    if search:
+        query = query.filter(BlogModel.title.ilike(f"%{search}%"))
+
+    total = query.count()
+    start = (page - 1) * limit
+    blogs = query.offset(start).limit(limit).all()
+    return {
+        "total": total,
+        "page": page,
+        "limit": limit,
+        "data": blogs
+    }
 
 # Get a single blog by ID endpoint
 @router.get("/{blog_id}", response_model=schemas.BlogResponse)
