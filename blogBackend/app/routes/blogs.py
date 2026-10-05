@@ -4,13 +4,14 @@ from sqlalchemy.orm import Session
 from app.schemas import schemas
 from app.database import get_db
 from app.models import Blog as BlogModel
+from app.routes.auth import verify_access_token
 
 
 router = APIRouter(prefix="/blogs", tags=["blogs"])
 
-# Create blog endpoint
+# Create blog endpoint (PROTECTED)
 @router.post("/", response_model=schemas.BlogResponse)
-def create_blog(blog:schemas.BlogCreate, db:Session=Depends(get_db)):
+def create_blog(blog:schemas.BlogCreate, db:Session=Depends(get_db), user:dict = Depends(verify_access_token)):
     new_blog = BlogModel(title=blog.title, content=blog.content)
     db.add(new_blog)
     db.commit()

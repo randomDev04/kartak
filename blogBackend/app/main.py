@@ -2,12 +2,13 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import engine
 import app.models
-from app.routes import blogs
+from app.routes import blogs, auth
 
 app.models.Base.metadata.create_all(bind=engine)
 
 appRouter = FastAPI(title="Blog API")
 appRouter.include_router(blogs.router)
+appRouter.include_router(auth.router)
 
 # Home route
 @appRouter.get("/")
