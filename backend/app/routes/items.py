@@ -1,5 +1,8 @@
-from fastapi import APIRouter
+from app.database import get_db
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
+from app.models import Item as ItemModel
 
 
 router = APIRouter(prefix="/items", tags=["items"])
@@ -10,10 +13,28 @@ class Item(BaseModel):
     in_stock:bool = True
 
 @router.post("")
-def post_item(item:Item):
-    return {"item":item, "message":"Item created successfully."}
+def post_item(item:Item, db:Session=Depends(get_db)):
+    db_item = ItemModel(name=item.name, price=item.price, in_stock=item.in_stock)
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    return {"item":db_item, "message":"Item created successfully."}
 
 @router.get("/{item_id}")
-def get_item(item_id:int):
-    return {"item_id": item_id, "message": "Item retrieved successfully."}  
+def get_item(item_id:int, db:Session=Depends(get_db)):
+    item = db.get(ItemModel, item_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return {"item": item, "message": "Item retrieved successfully."}
+
+@router.get("/")
+def get_Items(db:Session=Depends(get_db)):
+    todos = db.query(ItemModel).all()
+
+    return {
+        "total":len(todos),
+        "items":todos,
+        "message":"Items retrieved successfully."
+    }
+
 
